@@ -1,0 +1,22 @@
+{
+  "name": "АурумОбмін - Ювелірний Калькулятор",
+  "short_name": "АурумОбмін",
+  "description": "Професійний калькулятор обміну та розрахунку вартості брухту золота.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0c0e12",
+  "theme-color": "#181b22",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
