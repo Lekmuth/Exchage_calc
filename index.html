@@ -380,15 +380,33 @@
           </div>
           
           <details class="settings-hint-details" style="margin-top: 0.5rem;">
-            <summary>🔗 Як працює «Поділитися лінком»?</summary>
+            <summary>☁️ Як працює синхронізація налаштувань?</summary>
             <p>
-              Генерує посилання з усіма вашими налаштуваннями (ціни, категорії, назва магазину). Відкривши це посилання на іншому пристрої, калькулятор автоматично завантажить ваші ціни.<br>
-              <em>💡 Порада:</em> збережіть це посилання в нотатках або в «Збережених» Телеграму, щоб не втратити налаштування.
+              <strong>Щоб поділитися цінами з колегою:</strong><br>
+              1. Натисніть «☁️ Зберегти код» — додаток отримає короткий код (7 символів).<br>
+              2. Надішліть код колезі (у Telegram, запискою тощо).<br>
+              3. Колега вводить код у поле «Отримати налаштування» і натискає «Завантажити».<br>
+              <em>💡 Код діює 30 днів.</em>
             </p>
           </details>
 
-          <div class="drawer-footer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button id="share-settings-btn" class="btn btn-secondary" style="margin-right: auto;">🔗 Поділитися лінком</button>
+          <!-- Preset Code Share Block -->
+          <div class="preset-share-block">
+            <div class="preset-share-row">
+              <button id="share-settings-btn" class="btn btn-secondary">☁️ Зберегти код</button>
+              <div id="preset-code-box" class="preset-code-box" style="display: none;">
+                <span class="preset-code-label">Код:</span>
+                <strong id="preset-code-display" class="preset-code-value"></strong>
+                <button id="copy-code-btn" class="btn btn-secondary btn-sm">📋</button>
+              </div>
+            </div>
+            <div class="preset-load-row">
+              <input type="text" id="preset-code-input" placeholder="AB-1234 — код від колеги" maxlength="7" style="text-transform: uppercase; letter-spacing: 0.1em;">
+              <button id="load-preset-btn" class="btn btn-primary btn-sm">Завантажити</button>
+            </div>
+          </div>
+
+          <div class="drawer-footer">
             <button id="reset-settings-btn" class="btn btn-danger">Скинути до початкових</button>
             <button id="save-settings-btn" class="btn btn-primary">Зберегти та закрити</button>
           </div>

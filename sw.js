@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aurum-calc-v7';
+const CACHE_NAME = 'aurum-calc-v8';
 const ASSETS = [
   'index.html',
   'styles.css',

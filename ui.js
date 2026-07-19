@@ -2,7 +2,7 @@
 // UI: Theme, Category Buttons, Scrap Rows, Event Listeners, Settings Drawer
 // ==========================================================================
 import { DEFAULT_CATEGORIES, DEFAULT_GLOBAL_SETTINGS, state } from './constants.js';
-import { loadSettingsAndCategories, saveSettingsAndCategories, shareSettingsLink } from './storage.js';
+import { loadSettingsAndCategories, saveSettingsAndCategories, savePresetToCloud, loadPresetFromCloud, applyImportedPayload, showToastMsg } from './storage.js';
 import { calculate, formatNumber } from './calculator.js';
 
 // ---------- Theme ----------
@@ -483,8 +483,70 @@ export function initEventListeners() {
   // Reset and Save in Settings
   document.getElementById('reset-settings-btn').addEventListener('click', resetSettingsToDefault);
   document.getElementById('save-settings-btn').addEventListener('click', saveAndApplySettings);
-  document.getElementById('share-settings-btn').addEventListener('click', shareSettingsLink);
   document.getElementById('add-category-btn').addEventListener('click', addCategoryToDrawer);
+
+  // --- Cloud preset: SAVE ---
+  document.getElementById('share-settings-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('share-settings-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Збереження...';
+    try {
+      const code = await savePresetToCloud();
+      // Show code in the dedicated display area
+      document.getElementById('preset-code-display').textContent = code;
+      document.getElementById('preset-code-box').style.display = 'flex';
+      // Copy to clipboard automatically
+      navigator.clipboard.writeText(code).catch(() => {});
+      showToast(`✅ Код ${code} скопійовано! Надішліть його колезі.`);
+    } catch (e) {
+      showToast('❌ Помилка збереження. Перевірте інтернет.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '☁️ Зберегти код';
+    }
+  });
+
+  // Copy code button
+  document.getElementById('copy-code-btn').addEventListener('click', () => {
+    const code = document.getElementById('preset-code-display').textContent;
+    if (code) {
+      navigator.clipboard.writeText(code)
+        .then(() => showToast(`📋 Код ${code} скопійовано!`))
+        .catch(() => {});
+    }
+  });
+
+  // --- Cloud preset: LOAD ---
+  document.getElementById('load-preset-btn').addEventListener('click', async () => {
+    const input = document.getElementById('preset-code-input');
+    const code = input.value.trim();
+    if (!code) {
+      showToast('Введіть код від колеги');
+      return;
+    }
+    const btn = document.getElementById('load-preset-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳...';
+    try {
+      const data = await loadPresetFromCloud(code);
+      applyImportedPayload(data);
+      loadSettingsAndCategories();
+      initCategoryButtons();
+      if (!state.categories.find(c => c.id === state.activeCategoryId)) {
+        state.activeCategoryId = state.categories[0].id;
+      }
+      selectCategory(state.activeCategoryId);
+      calculate();
+      input.value = '';
+      document.getElementById('settings-drawer-overlay').classList.remove('open');
+      showToast('✅ Налаштування колеги успішно завантажено!');
+    } catch (e) {
+      showToast(`❌ ${e.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Завантажити';
+    }
+  });
 
   // Add New Item Row
   document.getElementById('add-new-item-row').addEventListener('click', () => {

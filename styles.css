@@ -1166,3 +1166,63 @@ select:focus {
 .app-footer a:hover {
   text-decoration: underline;
 }
+
+/* ==========================================================================
+   Preset Code Share / Load Block
+   ========================================================================== */
+.preset-share-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 1rem;
+}
+
+.preset-share-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.preset-load-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.preset-load-row input {
+  flex: 1;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.75rem !important;
+}
+
+.preset-code-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-card-hover);
+  border: 1px solid var(--gold-primary);
+  border-radius: var(--border-radius-sm);
+  padding: 0.35rem 0.75rem;
+}
+
+.preset-code-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.preset-code-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+  letter-spacing: 0.1em;
+}
