@@ -196,7 +196,8 @@ export function calculate() {
 
   } else {
     // Exchange Option (Metals are compared)
-    const exchangeLoss = state.settings.exchangeLoss !== undefined ? state.settings.exchangeLoss : 10.0;
+    const hasScrap = totalGrossWeight > 0;
+    const exchangeLoss = hasScrap ? (state.settings.exchangeLoss !== undefined ? state.settings.exchangeLoss : 10.0) : 0.0;
     const requiredWeight = Math.round((newWeight * (1 + exchangeLoss / 100)) * 100) / 100;
     const workCost = Math.round(newWeight * effectiveRateWork);
     const missingWeight = Math.round((requiredWeight - totalCleanWeight585) * 100) / 100;
