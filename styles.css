@@ -206,6 +206,12 @@ body {
   align-items: start;
 }
 
+.control-panel, .results-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
 /* 3-column layout for landscape tablets and desktops (e.g. iPad landscape is 1024px, triggers at 950px) */
 @media (min-width: 950px) {
   .main-content {
@@ -222,12 +228,6 @@ body {
   .main-content {
     grid-template-columns: 1fr;
   }
-}
-
-.control-panel, .results-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
 }
 
 #clear-calc-btn {
