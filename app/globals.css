@@ -1567,11 +1567,12 @@ select:focus {
   border-radius: var(--border-radius-md);
   padding: 1rem;
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: var(--text-primary);
   white-space: pre-wrap;
-  height: 350px;
+  min-height: 450px;
+  max-height: 65vh;
   overflow-y: auto;
   margin-bottom: 1rem;
 }
