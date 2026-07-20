@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { loadPresetFromCloud, savePresetToCloud } from '../utils/cloudStorage';
 
 export default function SettingsDrawer({ isOpen, onClose, globalSettings, updateSettings, categories, setCategories }) {
   const [exchangeLoss, setExchangeLoss] = useState(globalSettings.exchangeLoss);
@@ -26,32 +27,64 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
     setLocalCategories([...localCategories, { id: newId, name: 'Нова категорія', total: 0, work: 0 }]);
   };
 
-  const handleLoadProfile = () => {
+  const handleLoadProfile = async () => {
     if (!storeCode.trim()) return;
     try {
-      let decoded = storeCode.trim();
-      if (!decoded.startsWith('{') && !decoded.startsWith('[')) {
-        try {
-          decoded = decodeURIComponent(escape(atob(decoded)));
-        } catch (err) {
-          // ignore atob error
+      let data;
+      const codeStr = storeCode.trim();
+      
+      // If it looks like JSON or base64 JSON
+      if (codeStr.startsWith('{') || codeStr.startsWith('[')) {
+        data = JSON.parse(codeStr);
+      } else if (codeStr.length > 20) {
+        // Probable base64
+        data = JSON.parse(decodeURIComponent(escape(atob(codeStr))));
+      } else {
+        // Fetch from Supabase
+        data = await loadPresetFromCloud(codeStr);
+      }
+      
+      if (data.settings && data.categories) {
+        if (data.settings.exchangeLoss !== undefined) setExchangeLoss(data.settings.exchangeLoss);
+        setLocalCategories(data.categories);
+        updateSettings({
+          appTitle: data.settings.appTitle || globalSettings.appTitle,
+          appSubtitle: data.settings.appSubtitle || globalSettings.appSubtitle
+        });
+      } else {
+        // Legacy payload format fallback
+        if (data.exchangeLoss !== undefined) setExchangeLoss(data.exchangeLoss);
+        if (data.categories && Array.isArray(data.categories)) setLocalCategories(data.categories);
+        if (data.appTitle || data.appSubtitle) {
+          updateSettings({
+            appTitle: data.appTitle || globalSettings.appTitle,
+            appSubtitle: data.appSubtitle || globalSettings.appSubtitle
+          });
         }
       }
-      const data = JSON.parse(decoded);
       
-      if (data.exchangeLoss !== undefined) setExchangeLoss(data.exchangeLoss);
-      if (data.categories && Array.isArray(data.categories)) setLocalCategories(data.categories);
-      if (data.appTitle || data.appSubtitle) {
-        updateSettings({
-          appTitle: data.appTitle || globalSettings.appTitle,
-          appSubtitle: data.appSubtitle || globalSettings.appSubtitle
-        });
-      }
-      
-      alert('Профіль магазину успішно завантажено!');
+      alert('Профіль магазину успішно завантажено! Натисніть "Зберегти всі зміни" внизу.');
       setStoreCode('');
     } catch (e) {
-      alert('Помилка! Невірний код профілю.');
+      alert(`Помилка! ${e.message || 'Невірний код профілю.'}`);
+    }
+  };
+
+  const handleShareProfile = async () => {
+    try {
+      const payload = {
+        categories: localCategories,
+        settings: {
+          ...globalSettings,
+          exchangeLoss: parseFloat(exchangeLoss) || 10
+        }
+      };
+      const code = await savePresetToCloud(payload);
+      setStoreCode(code);
+      navigator.clipboard.writeText(code).catch(() => {});
+      alert(`✅ Ваш код: ${code}\nЙого вже скопійовано в буфер обміну! Надішліть цей код колегам.`);
+    } catch (e) {
+      alert('❌ Помилка генерації коду. Перевірте інтернет.');
     }
   };
 
@@ -77,7 +110,7 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
         
         <div className="settings-body" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 140px)' }}>
           <div className="settings-section" style={{ marginBottom: '2rem' }}>
-            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Завантаження профілю</h3>
+            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Синхронізація (Supabase Cloud)</h3>
             <div className="form-group">
               <label>Код профілю магазину:</label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -85,13 +118,19 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
                   type="text" 
                   value={storeCode} 
                   onChange={e => setStoreCode(e.target.value)} 
-                  placeholder="Вставте код сюди..." 
+                  placeholder="Наприклад: TW-53RA" 
+                  style={{ textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}
                 />
                 <button type="button" className="btn btn-secondary" onClick={handleLoadProfile}>
                   Завантажити
                 </button>
               </div>
-              <small className="help-text">Код автоматично оновить назву, втрати та категорії.</small>
+              <small className="help-text" style={{ marginBottom: '0.5rem', display: 'block' }}>
+                Введіть отриманий код, щоб автоматично оновити ціни та категорії.
+              </small>
+              <button type="button" className="btn btn-secondary" onClick={handleShareProfile} style={{ width: '100%' }}>
+                ☁️ Згенерувати мій код (Поділитися налаштуваннями)
+              </button>
             </div>
           </div>
 
