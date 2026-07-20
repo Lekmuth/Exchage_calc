@@ -1,12 +1,14 @@
+@import "tailwindcss";
+
 /* ==========================================================================
-   Design Tokens & Theme Variables — GemPlatform Style
+   Design Tokens & Theme Variables вЂ” GemPlatform Style
    ========================================================================== */
 :root {
   /* Fonts */
   --font-primary: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'Inter', monospace;
 
-  /* Theme: Dark Mode (Default) — Deep, rich, not pitch black */
+  /* Theme: Dark Mode (Default) вЂ” Deep, rich, not pitch black */
   --bg-app: radial-gradient(ellipse at 50% 0%, hsl(20, 20%, 9%) 0%, hsl(20, 20%, 4%) 100%);
   --bg-card: hsla(20, 15%, 9%, 0.92);
   --bg-card-hover: hsla(20, 12%, 12%, 0.95);
@@ -17,7 +19,7 @@
   --text-secondary: hsl(30, 8%, 58%);
   --text-muted: hsl(25, 6%, 42%);
 
-  /* Accent — Amber Gold */
+  /* Accent вЂ” Amber Gold */
   --accent-primary: hsl(42, 95%, 55%);
   --accent-hover: hsl(42, 95%, 65%);
   --accent-glow: hsla(42, 95%, 55%, 0.2);
@@ -57,7 +59,7 @@
   --transition-speed: 0.25s;
 }
 
-/* Light Theme — Warm, creamy, inviting (GemPlatform style) */
+/* Light Theme вЂ” Warm, creamy, inviting (GemPlatform style) */
 html[data-theme="light"] {
   --bg-app: radial-gradient(ellipse at 50% 0%, hsl(35, 30%, 98%) 0%, hsl(35, 20%, 92%) 100%);
   --bg-card: hsla(36, 25%, 97%, 0.92);
@@ -136,12 +138,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
+  padding: 0.75rem 1.25rem;
   background: var(--bg-card);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.5rem;
 }
 
 .logo-area {
@@ -151,12 +154,12 @@ body {
 }
 
 .logo-icon {
-  font-size: 2.25rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
 .logo-text h1 {
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: -0.025em;
   background: linear-gradient(135deg, var(--gold-primary), #ffd700);
@@ -165,7 +168,7 @@ body {
 }
 
 .logo-text p {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
 }
 
@@ -215,11 +218,14 @@ body {
 /* 3-column layout for landscape tablets and desktops (e.g. iPad landscape is 1024px, triggers at 950px) */
 @media (min-width: 950px) {
   .main-content {
-    grid-template-columns: 1.1fr 1.12fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 0.95rem; /* slightly tighter gap to fit 3 columns on tablet screen width */
   }
   .control-panel {
     display: contents; /* Pulls new-item and scrap sections up to main-content grid */
+  }
+  .main-content.purchase-mode .results-panel {
+    grid-column: span 2;
   }
 }
 
@@ -1113,14 +1119,14 @@ select:focus {
 }
 
 .settings-hint-details summary::before {
-  content: '▸ ';
+  content: 'в–ё ';
   font-size: 0.7rem;
   transition: transform 0.2s;
   display: inline-block;
 }
 
 .settings-hint-details[open] summary::before {
-  content: '▾ ';
+  content: 'в–ѕ ';
 }
 
 .settings-hint-details summary:hover {
@@ -1389,3 +1395,72 @@ select:focus {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ==========================================================================
+   Settings Drawer
+   ========================================================================== */
+.settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.settings-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.settings-drawer {
+  background: var(--bg-app);
+  width: 450px;
+  max-width: 90vw;
+  height: 100vh;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-drawer.active {
+  transform: translateX(0);
+}
+
+.settings-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-drawer-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-drawer-btn:hover {
+  color: var(--text-primary);
+}
+
+.settings-body {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+
