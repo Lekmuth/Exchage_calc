@@ -28,10 +28,13 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
       return;
     }
     const currentDesc = (item.desc || '').trim();
-    if (!currentDesc) {
-      updateItem(item.id, { desc: chip });
-    } else if (!currentDesc.includes(chip)) {
-      updateItem(item.id, { desc: `${currentDesc} ${chip}` });
+    if (currentDesc.includes(chip)) {
+      // Видаляємо чип, якщо він вже є в тексті
+      const newDesc = currentDesc.replace(chip, '').replace(/\s{2,}/g, ' ').trim();
+      updateItem(item.id, { desc: newDesc });
+    } else {
+      // Додаємо чип
+      updateItem(item.id, { desc: currentDesc ? `${currentDesc} ${chip}` : chip });
     }
   };
 
@@ -77,16 +80,19 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
                 placeholder="Наприклад: Каблучка з діамантом"
               />
               <div className="chips-container">
-                {DESC_CHIPS.map(chip => (
-                  <button 
-                    key={chip} 
-                    type="button" 
-                    className="chip-btn"
-                    onClick={() => handleDescChipClick(chip)}
-                  >
-                    {chip}
-                  </button>
-                ))}
+                {DESC_CHIPS.map(chip => {
+                  const isActive = chip !== 'Інше' && (item.desc || '').includes(chip);
+                  return (
+                    <button 
+                      key={chip} 
+                      type="button" 
+                      className={`chip-btn ${isActive ? 'active' : ''}`}
+                      onClick={() => handleDescChipClick(chip)}
+                    >
+                      {chip}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
