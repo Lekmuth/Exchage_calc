@@ -201,12 +201,23 @@ body {
    ========================================================================== */
 .main-content {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1.25rem;
   align-items: start;
 }
 
-@media (max-width: 1024px) {
+/* 3-column layout for landscape tablets and desktops */
+@media (min-width: 1120px) {
+  .main-content {
+    grid-template-columns: 1.1fr 1.1fr 1fr;
+  }
+  .control-panel {
+    display: contents; /* Pulls new-item and scrap sections up to main-content grid */
+  }
+}
+
+/* 1-column layout on mobile */
+@media (max-width: 767px) {
   .main-content {
     grid-template-columns: 1fr;
   }
@@ -215,7 +226,7 @@ body {
 .control-panel, .results-panel {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 /* ==========================================================================

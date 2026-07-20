@@ -493,6 +493,52 @@ function shareViaMessenger() {
   }
 }
 
+function clearCalculatorInputs() {
+  // 1. Clear new items table
+  const newItemTbody = document.getElementById('new-item-rows');
+  newItemTbody.innerHTML = '';
+  state.nextNewItemRowId = 1;
+  addNewItemRow(); // adds one empty row
+
+  // 2. Clear scrap items table
+  const scrapTbody = document.getElementById('scrap-rows');
+  scrapTbody.innerHTML = '';
+  state.nextRowId = 1;
+  addScrapRow(); // adds one empty row
+
+  // 3. Reset discount chips to '0'
+  const resetChips = (containerId) => {
+    const chips = document.querySelectorAll(`${containerId} .chip`);
+    chips.forEach(chip => {
+      if (chip.getAttribute('data-val') === '0') {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+    // Hide custom input fields if visible
+    const customInput = document.querySelector(`${containerId} ~ .discount-custom-input`);
+    if (customInput) {
+      customInput.style.display = 'none';
+      customInput.value = '0';
+    }
+  };
+
+  resetChips('#metal-discount-chips');
+  resetChips('#discount-chips');
+  resetChips('#buyback-chips');
+  
+  // Reset other values
+  document.getElementById('metal-discount-val').value = '0';
+  document.getElementById('discount-val').value = '0';
+  document.getElementById('buyback-adjust-val').value = '0';
+
+  // 4. Recalculate
+  calculate();
+  
+  showToast('🧹 Введені дані очищено!');
+}
+
 // ---------- Event Listeners Setup ----------
 export function initEventListeners() {
   // Theme Toggle
@@ -693,4 +739,7 @@ export function initEventListeners() {
   // Copy and Share Receipt Buttons
   document.getElementById('copy-receipt-btn').addEventListener('click', copyReceiptToClipboard);
   document.getElementById('share-whatsapp-btn').addEventListener('click', shareViaMessenger);
+  
+  // Clear Calculator Button
+  document.getElementById('clear-calc-btn').addEventListener('click', clearCalculatorInputs);
 }
