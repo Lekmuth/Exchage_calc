@@ -1,11 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function ScrapRow({ item, index, updateItem, removeItem }) {
+  const [expanded, setExpanded] = useState(true);
   const cleanWeight = item.weight * (1 - item.loss / 100) * (item.purity / 585);
 
   return (
-    <div style={{ background: 'var(--input-bg)', padding: '0.75rem', borderRadius: 'var(--border-radius-md)', marginBottom: '0.75rem', border: '1px solid var(--border-color)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center' }}>
+    <div className={`item-card ${expanded ? 'expanded' : ''}`} style={{ marginBottom: '0.5rem' }}>
+      <div className="item-card-header" onClick={() => setExpanded(!expanded)} style={{ padding: '0.75rem' }}>
+        <div className="item-card-summary">
+          <div className="item-card-title" style={{ fontSize: '0.95rem' }}>
+            {item.desc || `Брухт #${index + 1}`}
+          </div>
+          <div className="item-card-meta" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {item.weight || 0} г • Проба: {item.purity || 585} • Угар: {item.loss || 0}%
+          </div>
+        </div>
+        <div className="item-card-price" style={{ fontSize: '0.95rem', marginRight: '0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 'normal', lineHeight: '1' }}>Чиста (585)</span>
+          <span style={{ lineHeight: '1' }}>{(Math.round(cleanWeight * 100) / 100).toFixed(2)} г</span>
+        </div>
+        <div className="item-card-toggle">{expanded ? '▲' : '▼'}</div>
+      </div>
+
+      {expanded && (
+        <div className="item-card-body" style={{ padding: '0.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center' }}>
         <input 
           type="text" 
           value={item.desc}
@@ -54,7 +73,9 @@ export default function ScrapRow({ item, index, updateItem, removeItem }) {
             {(Math.round(cleanWeight * 100) / 100).toFixed(2)} г
           </div>
         </div>
-      </div>
+        </div>
+        </div>
+      )}
     </div>
   );
 }
