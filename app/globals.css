@@ -220,6 +220,12 @@ body {
   .main-content {
     grid-template-columns: 1.9fr 0.7fr 1.4fr;
     gap: 0.95rem; /* slightly tighter gap to fit 3 columns on tablet screen width */
+    transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* When all new item cards are collapsed, shrink the new items column and expand the scrap column */
+  .main-content:not(:has(#new-item-section .item-card.expanded)) {
+    grid-template-columns: 1.1fr 1.5fr 1.4fr;
   }
   .control-panel {
     display: contents; /* Pulls new-item and scrap sections up to main-content grid */
