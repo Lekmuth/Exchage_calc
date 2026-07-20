@@ -68,18 +68,19 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
       </div>
 
       {expanded && (
-        <div className="item-card-body">
-          <div className="form-row">
-            <div className="form-group col-12">
-              <label>Опис виробу:</label>
+        <div className="item-card-body" style={{ padding: '0.75rem' }}>
+          <div className="form-row" style={{ marginBottom: '0.5rem' }}>
+            <div className="form-group col-12" style={{ marginBottom: '0.5rem' }}>
+              <label style={{ marginBottom: '0.2rem' }}>Опис виробу:</label>
               <input 
                 type="text" 
                 ref={descInputRef}
                 value={item.desc}
                 onChange={e => updateItem(item.id, { desc: e.target.value })}
                 placeholder="Наприклад: Каблучка з діамантом"
+                style={{ padding: '0.4rem', fontSize: '0.9rem' }}
               />
-              <div className="chips-container">
+              <div className="chips-grid">
                 {DESC_CHIPS.map(chip => {
                   const isActive = chip !== 'Інше' && (item.desc || '').includes(chip);
                   return (
@@ -96,19 +97,20 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
               </div>
             </div>
           </div>
-          <div className="form-row">
-            <div className="form-group col-6">
-              <label>Вага, г:</label>
+          <div className="form-row" style={{ marginBottom: '0.5rem' }}>
+            <div className="form-group col-6" style={{ marginBottom: '0.5rem' }}>
+              <label style={{ marginBottom: '0.2rem' }}>Вага, г:</label>
               <input 
                 type="number" 
                 value={item.weight || ''}
                 onChange={e => updateItem(item.id, { weight: parseFloat(e.target.value) || 0 })}
                 min="0" step="0.01" 
+                style={{ padding: '0.4rem', fontSize: '0.9rem' }}
               />
             </div>
-            <div className="form-group col-6">
-              <label>Категорія:</label>
-              <select value={item.categoryId} onChange={handleCategoryChange}>
+            <div className="form-group col-6" style={{ marginBottom: '0.5rem' }}>
+              <label style={{ marginBottom: '0.2rem' }}>Категорія:</label>
+              <select value={item.categoryId} onChange={handleCategoryChange} style={{ padding: '0.4rem', fontSize: '0.9rem' }}>
                 {categories.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -117,7 +119,7 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
             </div>
           </div>
 
-          <div className="form-row rates-row">
+          <div className="form-row rates-row" style={{ marginBottom: '0' }}>
             <div className="form-group col-4">
               <label>Загальна, грн/г:</label>
               <input 

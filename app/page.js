@@ -197,11 +197,11 @@ export default function Calculator() {
                 </button>
               </div>
 
-              <div className="form-row" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
-                <div className="form-group col-12" style={{ maxWidth: '400px' }}>
-                  <label>Ціна викупу брухту (База: {globalSettings.buybackRate || 0} грн/г):</label>
+              <div className="form-row" style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>
+                <div className="form-group col-12" style={{ maxWidth: '400px', marginBottom: '0' }}>
+                  <label style={{ marginBottom: '0.2rem' }}>Ціна викупу брухту (База: {globalSettings.buybackRate || 0} грн/г):</label>
                   {!showCustomBuyback ? (
-                    <div className="chips-container" style={{ flexWrap: 'wrap', overflow: 'visible' }}>
+                    <div className="chips-container" style={{ flexWrap: 'wrap', overflow: 'visible', padding: '0' }}>
                       {BUYBACK_CHIPS.map(val => {
                         const targetRate = Math.max(0, (globalSettings.buybackRate || 0) - val);
                         return (
@@ -210,7 +210,7 @@ export default function Calculator() {
                             type="button" 
                             className={`chip-btn chip-discount ${buybackRate === targetRate ? 'active' : ''}`}
                             onClick={() => handleBuybackChipClick(val)}
-                            style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+                            style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
                           >
                             {val === 0 ? 'Базова' : `-${val}`}
                           </button>
@@ -220,13 +220,13 @@ export default function Calculator() {
                         type="button" 
                         className="chip-btn chip-discount"
                         onClick={() => handleBuybackChipClick('custom')}
-                        style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+                        style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
                       >
                         Інша
                       </button>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.25rem' }}>
                       <div className="input-with-unit" style={{ flex: 1 }}>
                         <input 
                           type="number" 
@@ -234,6 +234,7 @@ export default function Calculator() {
                           value={buybackRate} 
                           onChange={e => setBuybackRate(parseFloat(e.target.value) || 0)} 
                           step="50" min="0" 
+                          style={{ padding: '0.4rem', fontSize: '0.9rem' }}
                         />
                         <span className="unit">грн</span>
                       </div>
@@ -270,8 +271,8 @@ export default function Calculator() {
               </div>
               
               {calcData.caseType === 'exchange-excess' && (
-                <div className="excess-options-box">
-                  <h4>Є надлишок металу</h4>
+                <div className="excess-options-box" style={{ marginTop: '0.5rem', padding: '0.5rem' }}>
+                  <h4 style={{ margin: '0 0 0.5rem 0' }}>Є надлишок металу</h4>
                   <div className="segmented-control">
                     <input type="radio" id="excess-return" name="excess-treatment" value="return" 
                            checked={excessTreatment === 'return'} onChange={() => setExcessTreatment('return')} />
