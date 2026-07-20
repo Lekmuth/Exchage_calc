@@ -1464,3 +1464,100 @@ select:focus {
 }
 
 
+/* ==========================================================================
+   Quick Chips & Tabs
+   ========================================================================== */
+.chips-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+}
+.chips-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.chip-btn {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.chip-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--gold-primary);
+}
+
+.chip-btn.active {
+  background: var(--gold-primary);
+  color: var(--bg-main);
+  border-color: var(--gold-primary);
+}
+
+.chip-btn.chip-discount {
+  font-family: var(--font-mono);
+}
+
+.tabs-container {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  color: var(--gold-primary);
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--gold-primary);
+  border-radius: 2px 2px 0 0;
+}
+
+.text-receipt-container {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  height: 350px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}

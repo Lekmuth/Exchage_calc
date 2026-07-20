@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatNumber } from '../utils/formatNumber';
 
 export default function ResultsPanel({ calcData, setRounding }) {
@@ -19,19 +19,75 @@ export default function ResultsPanel({ calcData, setRounding }) {
   } = calcData;
 
   const isExchange = calcData.operation === 'exchange';
+  const [viewMode, setViewMode] = useState('table');
+
+  const generateReceiptText = () => {
+    let text = `АурумОбмін - Деталі розрахунку\n`;
+    text += `--------------------------------\n`;
+    text += `Нові вироби:\n`;
+    newItemBreakdownData.forEach((item, idx) => {
+      text += `${idx + 1}. ${item.desc || 'Виріб'} - ${formatNumber(item.weight)} г `;
+      if (isExchange) {
+        text += `(Робота: ${formatNumber(item.effectiveRateWork, 0)} грн/г)\n`;
+      } else {
+        text += `× ${formatNumber(item.effectiveRateTotal, 0)} грн/г\n`;
+      }
+    });
+
+    if (isExchange) {
+      text += `\nЗагальна вага нових: ${formatNumber(newWeight)} г\n`;
+      text += `Необхідно металу (+${formatNumber(exchangeLoss, 1)}% втрат): ${formatNumber(requiredWeight)} г\n`;
+      text += `Прийнято брухту (чистий 585): ${formatNumber(totalCleanWeight585)} г\n`;
+      text += `--------------------------------\n`;
+      
+      if (caseType === 'exchange-missing') {
+        text += `Нестача золота: +${formatNumber(missingWeight)} г\n`;
+        text += `Доплата за золото: ${formatNumber(metalCostToPay, 0)} грн\n`;
+        text += `Вартість роботи: ${formatNumber(workCost, 0)} грн\n`;
+      } else if (caseType === 'exchange-excess') {
+        text += `Надлишок металу: -${formatNumber(excessWeight)} г (повертається)\n`;
+        text += `Вартість роботи: ${formatNumber(workCost, 0)} грн\n`;
+      }
+    } else {
+      text += `--------------------------------\n`;
+      text += `Вартість без заокруглення: ${formatNumber(rawFinalToPay, 0)} грн\n`;
+    }
+
+    text += `--------------------------------\n`;
+    text += `ВСЬОГО ДО СПЛАТИ: ${formatNumber(finalToPay, 0)} грн\n`;
+    return text;
+  };
+
+  const copyReceipt = () => {
+    navigator.clipboard.writeText(generateReceiptText())
+      .then(() => alert('📋 Текст чека успішно скопійовано!'))
+      .catch(() => alert('❌ Помилка копіювання.'));
+  };
 
   return (
     <section className="results-panel">
       <div className="card card-results">
-        <div className="card-header">
-          <h2>📊 Результат розрахунку</h2>
-          <button id="copy-receipt-btn" className="icon-btn" title="Копіювати чек" style={{ fontSize: '1.2rem', padding: '0.3rem' }}>
-            📋
-          </button>
+        <div className="card-header" style={{ display: 'block' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h2>📊 Результат розрахунку</h2>
+            <button className="icon-btn" title="Копіювати чек" onClick={copyReceipt} style={{ fontSize: '1.2rem', padding: '0.3rem' }}>
+              📋
+            </button>
+          </div>
+          
+          <div className="tabs-container">
+            <button className={`tab-btn ${viewMode === 'table' ? 'active' : ''}`} onClick={() => setViewMode('table')}>
+              📊 Таблиця
+            </button>
+            <button className={`tab-btn ${viewMode === 'text' ? 'active' : ''}`} onClick={() => setViewMode('text')}>
+              📝 Текст
+            </button>
+          </div>
         </div>
         
         <div className="card-body">
-          <div className="results-breakdown" id="results-breakdown-list">
+          {viewMode === 'table' ? (
+            <div className="results-breakdown" id="results-breakdown-list">
             {newItemBreakdownData.map((item, idx) => (
               <div className="breakdown-row" key={idx}>
                 <span>Новий виріб #{idx + 1} ({item.desc})</span>
@@ -97,8 +153,13 @@ export default function ResultsPanel({ calcData, setRounding }) {
               </div>
             )}
           </div>
+          ) : (
+            <div className="text-receipt-container">
+              <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace' }}>{generateReceiptText()}</pre>
+            </div>
+          )}
 
-          <div className="final-price-box">
+          <div className="results-total-box" id="results-total-box">
             <span className="final-price-label">Всього до сплати:</span>
             <span className="final-price-value" id="final-to-pay">{formatNumber(finalToPay, 0)} <small>грн</small></span>
           </div>

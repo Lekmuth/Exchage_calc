@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+
+const DESC_CHIPS = ['Каблучка', 'Обручка', 'Сережки', 'Ланцюжок', 'Підвіс', 'Хрестик', 'Браслет', 'Інше'];
+const DISCOUNT_CHIPS = [0, 100, 200, 300, 400, 500];
 
 export default function NewItemCard({ item, index, categories, updateItem, removeItem }) {
   const [expanded, setExpanded] = useState(index === 0);
+  const [showCustomDiscount, setShowCustomDiscount] = useState(false);
+  const descInputRef = useRef(null);
 
   const handleCategoryChange = (e) => {
     const catId = e.target.value;
@@ -14,6 +19,28 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
       });
     } else {
       updateItem(item.id, { categoryId: 'custom' });
+    }
+  };
+
+  const handleDescChipClick = (chip) => {
+    if (chip === 'Інше') {
+      descInputRef.current?.focus();
+      return;
+    }
+    const currentDesc = (item.desc || '').trim();
+    if (!currentDesc) {
+      updateItem(item.id, { desc: chip });
+    } else if (!currentDesc.includes(chip)) {
+      updateItem(item.id, { desc: `${currentDesc} ${chip}` });
+    }
+  };
+
+  const handleDiscountChipClick = (val) => {
+    if (val === 'custom') {
+      setShowCustomDiscount(true);
+    } else {
+      setShowCustomDiscount(false);
+      updateItem(item.id, { discountWork: val });
     }
   };
 
@@ -44,10 +71,23 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
               <label>Опис виробу:</label>
               <input 
                 type="text" 
+                ref={descInputRef}
                 value={item.desc}
                 onChange={e => updateItem(item.id, { desc: e.target.value })}
                 placeholder="Наприклад: Каблучка з діамантом"
               />
+              <div className="chips-container">
+                {DESC_CHIPS.map(chip => (
+                  <button 
+                    key={chip} 
+                    type="button" 
+                    className="chip-btn"
+                    onClick={() => handleDescChipClick(chip)}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <div className="form-row">
@@ -90,12 +130,40 @@ export default function NewItemCard({ item, index, categories, updateItem, remov
             </div>
             <div className="form-group col-4">
               <label>Знижка, грн/г:</label>
-              <input 
-                type="number" 
-                value={item.discountWork || ''}
-                onChange={e => updateItem(item.id, { discountWork: parseFloat(e.target.value) || 0 })}
-                className="discount-input"
-              />
+              {!showCustomDiscount ? (
+                <div className="chips-container" style={{ flexWrap: 'wrap', overflow: 'visible' }}>
+                  {DISCOUNT_CHIPS.map(val => (
+                    <button 
+                      key={val} 
+                      type="button" 
+                      className={`chip-btn chip-discount ${item.discountWork === val ? 'active' : ''}`}
+                      onClick={() => handleDiscountChipClick(val)}
+                      style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+                    >
+                      {val === 0 ? '0' : `-${val}`}
+                    </button>
+                  ))}
+                  <button 
+                    type="button" 
+                    className="chip-btn chip-discount"
+                    onClick={() => handleDiscountChipClick('custom')}
+                    style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+                  >
+                    Інша
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input 
+                    type="number" 
+                    value={item.discountWork || ''}
+                    onChange={e => updateItem(item.id, { discountWork: parseFloat(e.target.value) || 0 })}
+                    className="discount-input"
+                    autoFocus
+                  />
+                  <button type="button" className="icon-btn" onClick={() => setShowCustomDiscount(false)} title="Назад до швидких знижок">🔙</button>
+                </div>
+              )}
             </div>
           </div>
           <div className="card-actions-right" style={{ marginTop: '0.5rem', textAlign: 'right' }}>

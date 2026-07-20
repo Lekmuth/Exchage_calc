@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NewItemCard from '../components/NewItemCard';
 import ScrapRow from '../components/ScrapRow';
 import ResultsPanel from '../components/ResultsPanel';
@@ -30,6 +30,20 @@ export default function Calculator() {
   const [excessTreatment, setExcessTreatment] = useState('return');
   
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showCustomBuyback, setShowCustomBuyback] = useState(false);
+  const buybackInputRef = useRef(null);
+
+  const BUYBACK_CHIPS = [0, 50, 100, 150, 200];
+
+  const handleBuybackChipClick = (val) => {
+    if (val === 'custom') {
+      setShowCustomBuyback(true);
+      setTimeout(() => buybackInputRef.current?.focus(), 50);
+    } else {
+      setShowCustomBuyback(false);
+      setBuybackRate(Math.max(0, (globalSettings.buybackRate || 0) - val));
+    }
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -184,12 +198,48 @@ export default function Calculator() {
               </div>
 
               <div className="form-row" style={{ marginBottom: '1rem', marginTop: '1rem' }}>
-                <div className="form-group col-6">
-                  <label>Ціна викупу брухту за грам:</label>
-                  <div className="input-with-unit">
-                    <input type="number" value={buybackRate} onChange={e => setBuybackRate(e.target.value)} step="50" min="0" />
-                    <span className="unit">грн</span>
-                  </div>
+                <div className="form-group col-12" style={{ maxWidth: '400px' }}>
+                  <label>Ціна викупу брухту (База: {globalSettings.buybackRate || 0} грн/г):</label>
+                  {!showCustomBuyback ? (
+                    <div className="chips-container" style={{ flexWrap: 'wrap', overflow: 'visible' }}>
+                      {BUYBACK_CHIPS.map(val => {
+                        const targetRate = Math.max(0, (globalSettings.buybackRate || 0) - val);
+                        return (
+                          <button 
+                            key={val} 
+                            type="button" 
+                            className={`chip-btn chip-discount ${buybackRate === targetRate ? 'active' : ''}`}
+                            onClick={() => handleBuybackChipClick(val)}
+                            style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+                          >
+                            {val === 0 ? 'Базова' : `-${val}`}
+                          </button>
+                        );
+                      })}
+                      <button 
+                        type="button" 
+                        className="chip-btn chip-discount"
+                        onClick={() => handleBuybackChipClick('custom')}
+                        style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+                      >
+                        Інша
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <div className="input-with-unit" style={{ flex: 1 }}>
+                        <input 
+                          type="number" 
+                          ref={buybackInputRef}
+                          value={buybackRate} 
+                          onChange={e => setBuybackRate(parseFloat(e.target.value) || 0)} 
+                          step="50" min="0" 
+                        />
+                        <span className="unit">грн</span>
+                      </div>
+                      <button type="button" className="icon-btn" onClick={() => setShowCustomBuyback(false)} title="Назад до швидких кнопок">🔙</button>
+                    </div>
+                  )}
                 </div>
               </div>
 
