@@ -244,30 +244,16 @@ export default function Calculator() {
                 </div>
               </div>
 
-              <div className="scrap-table-container">
-                <table className="scrap-table" id="scrap-table">
-                  <thead>
-                    <tr>
-                      <th>Опис (опціонально)</th>
-                      <th style={{ width: '100px' }}>Вага брутто, г</th>
-                      <th style={{ width: '100px' }}>Проба</th>
-                      <th style={{ width: '80px' }}>Угар, %</th>
-                      <th style={{ width: '100px', textAlign: 'right' }}>Чиста вага (585), г</th>
-                      <th style={{ width: '50px' }}></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {scrapItems.map((item, index) => (
-                      <ScrapRow 
-                        key={item.id}
-                        item={item}
-                        index={index}
-                        updateItem={updateScrapItem}
-                        removeItem={removeScrapItem}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+              <div className="scrap-items-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {scrapItems.map((item, index) => (
+                  <ScrapRow 
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    updateItem={updateScrapItem}
+                    removeItem={removeScrapItem}
+                  />
+                ))}
               </div>
               
               {calcData.caseType === 'exchange-excess' && (

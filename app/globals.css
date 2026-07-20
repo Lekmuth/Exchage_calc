@@ -218,7 +218,7 @@ body {
 /* 3-column layout for landscape tablets and desktops (e.g. iPad landscape is 1024px, triggers at 950px) */
 @media (min-width: 950px) {
   .main-content {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1.9fr 0.7fr 1.4fr;
     gap: 0.95rem; /* slightly tighter gap to fit 3 columns on tablet screen width */
   }
   .control-panel {
