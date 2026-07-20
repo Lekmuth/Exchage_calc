@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# АурумОбмін (AurumExchange) - Ювелірний Калькулятор
 
-## Getting Started
+## Опис проекту
+АурумОбмін — це зручний та сучасний калькулятор для ювелірних магазинів, що дозволяє швидко розраховувати вартість нових виробів, оцінювати брухт від клієнтів та формувати підсумковий розрахунок (з урахуванням угару, роботи, загальної вартості та обміну металу).
 
-First, run the development server:
+## 🚀 Оновлення: Міграція на Next.js та React (Липень 2026)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Додаток був успішно перенесений зі старого Vanilla JS (окремі файли HTML/CSS/JS) на сучасний фреймворк **Next.js (React)**. Це забезпечило:
+- Підвищену продуктивність та швидкість роботи.
+- Модульну архітектуру (компоненти React: `NewItemCard`, `ScrapRow`, `ResultsPanel` тощо).
+- Зручний деплой та інтеграцію через Vercel.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Основні покращення UI та логіки:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+#### 1. Розумна динамічна компоновка (CSS Grid)
+- Інтерфейс автоматично підлаштовується під ваші дії: коли ви закінчили роботу з "Новими виробами" і згортаєте всі їхні картки, колонка "Брухту" автоматично розширюється.
+- Використання сучасного селектору `:has()` для плавної зміни ширини колонок.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### 2. Компактні згортальні картки (Collapsible Cards)
+- Всі позиції (як нові вироби, так і брухт) можна згортати.
+- У згорнутому вигляді картка відображає лише найважливішу коротку інформацію (назву, вагу, пробу, розраховану чисту вагу), що дозволяє не перевантажувати екран довгими формами.
 
-## Learn More
+#### 3. Швидкі чипи (Quick Chips)
+- Замість довгого ручного вводу додано компактні кнопки-теги:
+  - **Опис виробу:** `Каблучка`, `Сережки`, `Ланцюжок` тощо (з можливістю вибору як "активного" чипу та комбінування з текстом).
+  - **Знижки на роботу:** миттєві кнопки знижок (наприклад, `-100`, `-200`).
+  - **Ціна викупу брухту:** миттєві віднімання від вашої базової ціни (`-50`, `-100`).
 
-To learn more about Next.js, take a look at the following resources:
+#### 4. Текстовий чек (Text Receipt)
+- Панель результатів тепер має дві вкладки: "Таблиця" та "Текст".
+- У вкладці "Текст" автоматично формується текстовий чек з розрахунком. 
+- Назву магазину для заголовка чека можна редагувати в Налаштуваннях.
+- Кнопка **"Копіювати чек"** дозволяє миттєво скопіювати розрахунок для відправки клієнту в месенджер.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### 5. Хмарна синхронізація налаштувань (Supabase)
+- Завдяки інтеграції з базою даних Supabase (через `utils/cloudStorage.js`), ви можете зберігати всі свої налаштування, категорії та ціни в хмарі.
+- Натиснувши "Згенерувати мій код", ви отримуєте унікальний ідентифікатор (наприклад, `TW-53RA`), за допомогою якого можна миттєво завантажити свій "Профіль магазину" на будь-якому іншому пристрої.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Технологічний стек
+- **Frontend:** React, Next.js (App Router)
+- **Стилізація:** Vanilla CSS (CSS Variables, CSS Grid, Flexbox)
+- **База даних:** Supabase
+- **Хостинг та Деплой:** Vercel
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Локальний запуск
+1. Встановіть залежності: `npm install`
+2. Запустіть сервер: `npm run dev`
+3. Відкрийте [http://localhost:3000](http://localhost:3000) у вашому браузері.
