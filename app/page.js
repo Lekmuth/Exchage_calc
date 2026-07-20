@@ -287,7 +287,7 @@ export default function Calculator() {
         </section>
 
         {/* Results Panel */}
-        <ResultsPanel calcData={calcData} setRounding={setRounding} />
+        <ResultsPanel calcData={calcData} setRounding={setRounding} globalSettings={globalSettings} />
 
       </main>
 

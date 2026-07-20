@@ -4,6 +4,7 @@ import { loadPresetFromCloud, savePresetToCloud } from '../utils/cloudStorage';
 export default function SettingsDrawer({ isOpen, onClose, globalSettings, updateSettings, categories, setCategories, buybackRate, setBuybackRate }) {
   const [exchangeLoss, setExchangeLoss] = useState(globalSettings.exchangeLoss);
   const [localBuybackRate, setLocalBuybackRate] = useState(buybackRate || 2000);
+  const [localAppTitle, setLocalAppTitle] = useState(globalSettings.appTitle || 'АурумОбмін');
   const [localCategories, setLocalCategories] = useState([...categories]);
   const [storeCode, setStoreCode] = useState('');
 
@@ -11,14 +12,16 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
     if (isOpen) {
       setExchangeLoss(globalSettings.exchangeLoss);
       setLocalBuybackRate(buybackRate);
+      setLocalAppTitle(globalSettings.appTitle || 'АурумОбмін');
       setLocalCategories([...categories]);
     }
-  }, [isOpen, globalSettings.exchangeLoss, categories, buybackRate]);
+  }, [isOpen, globalSettings.exchangeLoss, categories, buybackRate, globalSettings.appTitle]);
 
   const handleSave = () => {
     updateSettings({
       exchangeLoss: parseFloat(exchangeLoss) || 10,
-      buybackRate: parseFloat(localBuybackRate) || 0
+      buybackRate: parseFloat(localBuybackRate) || 0,
+      appTitle: localAppTitle.trim() || 'АурумОбмін'
     });
     setBuybackRate(parseFloat(localBuybackRate) || 0);
     setCategories(localCategories);
@@ -83,7 +86,8 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
         settings: {
           ...globalSettings,
           exchangeLoss: parseFloat(exchangeLoss) || 10,
-          buybackRate: parseFloat(localBuybackRate) || 0
+          buybackRate: parseFloat(localBuybackRate) || 0,
+          appTitle: localAppTitle.trim() || 'АурумОбмін'
         }
       };
       const code = await savePresetToCloud(payload);
@@ -144,6 +148,17 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
           <div className="settings-section" style={{ marginBottom: '2rem' }}>
             <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Базові налаштування</h3>
             
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label>Назва профілю (Магазину):</label>
+              <input 
+                type="text" 
+                value={localAppTitle} 
+                onChange={e => setLocalAppTitle(e.target.value)} 
+                placeholder="Наприклад: АурумОбмін" 
+              />
+              <small className="help-text">Ця назва буде відображатися в чеках і шапці (після оновлення сторінки).</small>
+            </div>
+
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>Базова ціна викупу брухту (грн/г):</label>
               <input 

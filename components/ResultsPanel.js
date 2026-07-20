@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { formatNumber } from '../utils/formatNumber';
 
-export default function ResultsPanel({ calcData, setRounding }) {
+export default function ResultsPanel({ calcData, setRounding, globalSettings }) {
   const {
     caseType,
     newItemBreakdownData,
@@ -22,7 +22,7 @@ export default function ResultsPanel({ calcData, setRounding }) {
   const [viewMode, setViewMode] = useState('table');
 
   const generateReceiptText = () => {
-    let text = `АурумОбмін - Деталі розрахунку\n`;
+    let text = `${globalSettings?.appTitle || 'АурумОбмін'} - Деталі розрахунку\n`;
     text += `--------------------------------\n`;
     text += `Нові вироби:\n`;
     newItemBreakdownData.forEach((item, idx) => {
