@@ -13,39 +13,57 @@ export function formatNumber(num, decimals = 2) {
 export function calculate() {
   // 1. Get New Items weights and descriptions
   let newWeight = 0;
-  const newItemBreakdownData = [];
-  const newItemRows = document.querySelectorAll('#new-item-rows tr');
+  let workCostTotal = 0;
+  let metalCostTotal = 0;
   
-  newItemRows.forEach(row => {
-    const descInput = row.querySelector('.new-item-desc-input').value;
-    const weightInput = parseFloat(row.querySelector('.new-item-weight-input').value) || 0;
+  const newItemBreakdownData = [];
+  const newItemCards = document.querySelectorAll('.item-card');
+  
+  newItemCards.forEach(card => {
+    const descInput = card.querySelector('.new-item-desc-input').value;
+    const weightInput = parseFloat(card.querySelector('.new-item-weight-input').value) || 0;
+    
+    const rateTotal = parseFloat(card.querySelector('.new-item-rate-total').value) || 0;
+    const rateWork = parseFloat(card.querySelector('.new-item-rate-work').value) || 0;
+    const discountWork = parseFloat(card.querySelector('.new-item-discount').value) || 0;
+    
+    const effectiveRateWork = Math.max(0, rateWork - discountWork);
+    const effectiveRateMetal = Math.max(0, rateTotal - rateWork);
+    const effectiveRateTotal = effectiveRateMetal + effectiveRateWork;
+    
     newWeight += weightInput;
+    
     if (weightInput > 0) {
+      const itemWorkCost = weightInput * effectiveRateWork;
+      const itemMetalCost = weightInput * effectiveRateMetal;
+      
+      workCostTotal += itemWorkCost;
+      metalCostTotal += itemMetalCost;
+      
       newItemBreakdownData.push({
         desc: descInput || 'Новий виріб',
-        weight: weightInput
+        weight: weightInput,
+        effectiveRateWork,
+        effectiveRateMetal,
+        effectiveRateTotal,
+        itemWorkCost,
+        itemMetalCost
       });
+      
+      // Also update the card header summary price dynamically
+      card.querySelector('.item-card-price').textContent = formatNumber(itemWorkCost + itemMetalCost, 0) + ' грн';
+    } else {
+      card.querySelector('.item-card-price').textContent = '0 грн';
     }
   });
 
   // Round newWeight to 2 decimals
   newWeight = Math.round(newWeight * 100) / 100;
 
-  // Get rates and discounts
-  const rateMetal = parseFloat(document.getElementById('rate-metal').value) || 0;
-  const rateWork = parseFloat(document.getElementById('rate-work').value) || 0;
-  
-  const metalDiscount = parseFloat(document.getElementById('metal-discount-val').value) || 0;
-  const discount = parseFloat(document.getElementById('discount-val').value) || 0; // work discount
-  
-  const effectiveRateMetal = Math.max(0, rateMetal - metalDiscount);
-  const effectiveRateWork = Math.max(0, rateWork - discount);
+  // Calculate average rates for overall displays and missing weight calculations
+  const effectiveRateMetal = newWeight > 0 ? metalCostTotal / newWeight : 0;
+  const effectiveRateWork = newWeight > 0 ? workCostTotal / newWeight : 0;
   const effectiveRateTotal = effectiveRateMetal + effectiveRateWork;
-
-  // Update rates in UI
-  document.getElementById('rate-total').value = effectiveRateTotal;
-  document.getElementById('gold-price-val').innerText = formatNumber(effectiveRateMetal, 0);
-  document.getElementById('work-price-val').innerText = formatNumber(effectiveRateWork, 0);
 
   // Buyback rate and adjustments
   const baseBuybackRate = parseFloat(document.getElementById('buyback-rate-input').value) || 0;
@@ -153,34 +171,17 @@ export function calculate() {
   
   if (!isExchange || newWeight === 0) {
     // Simple Purchase Option
-    rawFinalToPay = Math.round(newWeight * effectiveRateTotal);
+    rawFinalToPay = Math.round(workCostTotal + metalCostTotal);
     
     let breakdownHtml = '';
     newItemBreakdownData.forEach((item, idx) => {
       breakdownHtml += `
         <div class="breakdown-row">
           <span>Новий виріб #${idx+1} (${item.desc})</span>
-          <span>${formatNumber(item.weight, 2)} г × ${formatNumber(effectiveRateTotal, 0)} грн/г</span>
+          <span>${formatNumber(item.weight, 2)} г × ${formatNumber(item.effectiveRateTotal, 0)} грн/г</span>
         </div>
       `;
     });
-
-    if (metalDiscount > 0) {
-      breakdownHtml += `
-        <div class="breakdown-row">
-          <span>Знижка на метал</span>
-          <span>-${formatNumber(metalDiscount, 0)} грн/г</span>
-        </div>
-      `;
-    }
-    if (discount > 0) {
-      breakdownHtml += `
-        <div class="breakdown-row">
-          <span>Знижка на роботу</span>
-          <span>-${formatNumber(discount, 0)} грн/г</span>
-        </div>
-      `;
-    }
 
     breakdownHtml += `
       <div class="breakdown-row">
@@ -199,7 +200,7 @@ export function calculate() {
     const hasScrap = totalGrossWeight > 0;
     const exchangeLoss = hasScrap ? (state.settings.exchangeLoss !== undefined ? state.settings.exchangeLoss : 10.0) : 0.0;
     const requiredWeight = Math.round((newWeight * (1 + exchangeLoss / 100)) * 100) / 100;
-    const workCost = Math.round(newWeight * effectiveRateWork);
+    const workCost = Math.round(workCostTotal);
     const missingWeight = Math.round((requiredWeight - totalCleanWeight585) * 100) / 100;
     
     let breakdownHtml = '';
@@ -207,7 +208,7 @@ export function calculate() {
       breakdownHtml += `
         <div class="breakdown-row">
           <span>Новий виріб #${idx+1} (${item.desc})</span>
-          <span>${formatNumber(item.weight, 2)} г</span>
+          <span>${formatNumber(item.weight, 2)} г (Робота: ${formatNumber(item.effectiveRateWork, 0)} грн/г)</span>
         </div>
       `;
     });
@@ -238,31 +239,14 @@ export function calculate() {
           <span style="color: var(--crimson-text); font-weight:700;">+ ${formatNumber(missingWeight, 2)} г</span>
         </div>
         <div class="breakdown-row">
-          <span>Вартість доплати за золото</span>
+          <span>Вартість доплати за золото (за середнім тарифом)</span>
           <span>${formatNumber(missingWeight, 2)} г × ${formatNumber(effectiveRateMetal, 0)} грн/г = ${formatNumber(metalCostToPay, 0)} грн</span>
         </div>
         <div class="breakdown-row">
-          <span>Вартість роботи (зі знижкою)</span>
-          <span>${formatNumber(newWeight, 2)} г × ${formatNumber(effectiveRateWork, 0)} грн/г = ${formatNumber(workCost, 0)} грн</span>
+          <span>Вартість роботи (зі знижками)</span>
+          <span>${formatNumber(workCost, 0)} грн</span>
         </div>
       `;
-
-      if (metalDiscount > 0) {
-        breakdownHtml += `
-          <div class="breakdown-row">
-            <span>Знижка на метал</span>
-            <span>-${formatNumber(metalDiscount, 0)} грн/г (еф. ціна: ${formatNumber(effectiveRateMetal, 0)} грн/г)</span>
-          </div>
-        `;
-      }
-      if (discount > 0) {
-        breakdownHtml += `
-          <div class="breakdown-row">
-            <span>Знижка на роботу</span>
-            <span>-${formatNumber(discount, 0)} грн/г (еф. ціна: ${formatNumber(effectiveRateWork, 0)} грн/г)</span>
-          </div>
-        `;
-      }
 
       resultsBreakdownList.innerHTML = breakdownHtml;
 
@@ -292,18 +276,9 @@ export function calculate() {
           </div>
           <div class="breakdown-row">
             <span>Вартість роботи (до сплати)</span>
-            <span>${formatNumber(newWeight, 2)} г × ${formatNumber(effectiveRateWork, 0)} грн/г = ${formatNumber(workCost, 0)} грн</span>
+            <span>${formatNumber(workCost, 0)} грн</span>
           </div>
         `;
-
-        if (discount > 0) {
-          breakdownHtml += `
-            <div class="breakdown-row">
-              <span>Знижка на роботу</span>
-              <span>-${formatNumber(discount, 0)} грн/г (еф. ціна: ${formatNumber(effectiveRateWork, 0)} грн/г)</span>
-            </div>
-          `;
-        }
 
         resultsBreakdownList.innerHTML = breakdownHtml;
 

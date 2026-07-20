@@ -70,27 +70,6 @@ export function selectCategory(id) {
   document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
   const activeBtn = document.getElementById(`btn-cat-${id}`);
   if (activeBtn) activeBtn.classList.add('active');
-
-  const rateMetalInput = document.getElementById('rate-metal');
-  const rateWorkInput = document.getElementById('rate-work');
-  const rateTotalInput = document.getElementById('rate-total');
-
-  if (id === 'custom') {
-    rateMetalInput.readOnly = false;
-    rateWorkInput.readOnly = false;
-    rateMetalInput.focus();
-  } else {
-    const cat = state.categories.find(c => c.id === id);
-    if (cat) {
-      rateMetalInput.value = cat.total - cat.work;
-      rateWorkInput.value = cat.work;
-      rateTotalInput.value = cat.total;
-      rateMetalInput.readOnly = false;
-      rateWorkInput.readOnly = false;
-    }
-  }
-  
-  calculate();
 }
 
 // ---------- Settings Drawer ----------
@@ -296,54 +275,156 @@ function setupQuickChips(container, inputEl) {
 }
 
 // ---------- New Item Rows ----------
-export function addNewItemRow(description = '', weight = '') {
+export function addNewItemRow(description = '', weight = '', categoryId = null) {
   const rowId = state.nextNewItemRowId++;
-  const tbody = document.getElementById('new-item-rows');
+  const container = document.getElementById('new-item-cards');
   
-  const tr = document.createElement('tr');
-  tr.id = `new-item-row-${rowId}`;
-  tr.innerHTML = `
-    <td>
-      <div class="desc-cell-wrapper">
-        <input type="text" class="new-item-desc-input" placeholder="Кільце, сережки..." value="${description}">
+  // Default to active category if none specified
+  if (!categoryId) {
+    categoryId = state.activeCategoryId;
+  }
+  
+  // Find category details
+  let category = state.categories.find(c => c.id === categoryId);
+  if (!category && categoryId !== 'custom') category = state.categories[0];
+  
+  const rateTotal = category ? category.total : 0;
+  const rateWork = category ? category.work : 0;
+  
+  // Create category options HTML
+  const optionsHtml = state.categories.map(c => 
+    `<option value="${c.id}" ${category && c.id === category.id ? 'selected' : ''}>${c.name}</option>`
+  ).join('') + `<option value="custom" ${categoryId === 'custom' ? 'selected' : ''}>Своя ціна</option>`;
+
+  const card = document.createElement('div');
+  card.className = 'item-card expanded'; // default open
+  card.id = `new-item-card-${rowId}`;
+  
+  card.innerHTML = `
+    <div class="item-card-header" data-toggle-card="${rowId}">
+      <div class="item-card-summary">
+        <div class="item-card-title">${description || 'Новий виріб'}</div>
+        <div class="item-card-subtitle">
+          <span class="summary-weight">${weight ? weight + ' г' : '0 г'}</span> • 
+          <span class="summary-category">${category ? category.name : 'Своя ціна'}</span>
+        </div>
       </div>
-    </td>
-    <td>
-      <div class="input-with-unit" style="padding-right: 0;">
-        <input type="number" class="new-item-weight-input" data-row-id="${rowId}" step="0.01" min="0" placeholder="0.00" value="${weight}" style="padding-right: 1.5rem;">
-        <span class="unit" style="right: 0.5rem; font-size: 0.8rem;">г</span>
+      <div class="item-card-price">0 грн</div>
+      <button type="button" class="item-card-toggle">▼</button>
+    </div>
+    <div class="item-card-body">
+      <div class="form-row">
+        <div class="form-group col-12">
+          <label>Опис (опціонально):</label>
+          <div class="desc-cell-wrapper">
+            <input type="text" class="new-item-desc-input" placeholder="Кільце, сережки..." value="${description}">
+          </div>
+        </div>
       </div>
-    </td>
-    <td style="text-align: center;">
-      <button type="button" class="delete-btn" data-delete-row="${rowId}">🗑️</button>
-    </td>
+      <div class="form-row">
+        <div class="form-group col-6">
+          <label>Вага виробу, г:</label>
+          <div class="input-with-unit">
+            <input type="number" class="new-item-weight-input" data-row-id="${rowId}" step="0.01" min="0" placeholder="0.00" value="${weight}">
+            <span class="unit">г</span>
+          </div>
+        </div>
+        <div class="form-group col-6">
+          <label>Категорія:</label>
+          <select class="new-item-category-select" data-row-id="${rowId}">
+            ${optionsHtml}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-4">
+          <label>Ціна (загальна):</label>
+          <div class="input-with-unit">
+            <input type="number" class="new-item-rate-total" value="${rateTotal}" step="10">
+            <span class="unit">грн/г</span>
+          </div>
+        </div>
+        <div class="form-group col-4">
+          <label>Ціна (робота):</label>
+          <div class="input-with-unit">
+            <input type="number" class="new-item-rate-work" value="${rateWork}" step="10">
+            <span class="unit">грн/г</span>
+          </div>
+        </div>
+        <div class="form-group col-4">
+          <label>Знижка (на роботу):</label>
+          <div class="input-with-unit">
+            <input type="number" class="new-item-discount" value="0" step="10" min="0">
+            <span class="unit">грн/г</span>
+          </div>
+        </div>
+      </div>
+      <div class="item-card-actions">
+        <button type="button" class="btn btn-secondary btn-sm delete-btn" data-delete-row="${rowId}" style="color: var(--crimson-primary); border-color: rgba(220, 53, 69, 0.3); background: rgba(220, 53, 69, 0.05);">
+          🗑️ Видалити
+        </button>
+      </div>
+    </div>
   `;
   
-  tbody.appendChild(tr);
+  container.appendChild(card);
 
   // Setup quick chips under description input
-  const descWrapper = tr.querySelector('.desc-cell-wrapper');
-  const inputEl = tr.querySelector('.new-item-desc-input');
+  const descWrapper = card.querySelector('.desc-cell-wrapper');
+  const inputEl = card.querySelector('.new-item-desc-input');
   setupQuickChips(descWrapper, inputEl);
 
   // Hook up delete button
-  tr.querySelector(`[data-delete-row="${rowId}"]`).addEventListener('click', () => deleteNewItemRow(rowId));
+  card.querySelector(`[data-delete-row="${rowId}"]`).addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent toggle
+    deleteNewItemRow(rowId);
+  });
+
+  // Hook up toggle
+  card.querySelector('.item-card-header').addEventListener('click', () => {
+    card.classList.toggle('expanded');
+  });
+
+  // Category select change logic
+  const categorySelect = card.querySelector('.new-item-category-select');
+  const rateTotalInput = card.querySelector('.new-item-rate-total');
+  const rateWorkInput = card.querySelector('.new-item-rate-work');
+  
+  categorySelect.addEventListener('change', (e) => {
+    const selectedCat = state.categories.find(c => c.id === e.target.value);
+    if (selectedCat) {
+      rateTotalInput.value = selectedCat.total;
+      rateWorkInput.value = selectedCat.work;
+      card.querySelector('.summary-category').textContent = selectedCat.name;
+    } else {
+      card.querySelector('.summary-category').textContent = 'Своя ціна';
+    }
+    calculate();
+  });
+
+  // Name and weight summary update logic
+  inputEl.addEventListener('input', (e) => {
+    card.querySelector('.item-card-title').textContent = e.target.value || 'Новий виріб';
+  });
+  card.querySelector('.new-item-weight-input').addEventListener('input', (e) => {
+    card.querySelector('.summary-weight').textContent = (e.target.value || '0') + ' г';
+  });
 
   // Hook up live calculation listeners for this row
-  const rowElements = tr.querySelectorAll('input');
+  const rowElements = card.querySelectorAll('input, select');
   rowElements.forEach(el => {
     el.addEventListener('input', calculate);
   });
 }
 
 export function deleteNewItemRow(rowId) {
-  const row = document.getElementById(`new-item-row-${rowId}`);
-  if (row) {
-    row.remove();
+  const card = document.getElementById(`new-item-card-${rowId}`);
+  if (card) {
+    card.remove();
     
     // If no rows remain, add a fresh empty one
-    const tbody = document.getElementById('new-item-rows');
-    if (tbody.children.length === 0) {
+    const container = document.getElementById('new-item-cards');
+    if (container.children.length === 0) {
       addNewItemRow();
     }
     calculate();

@@ -83,73 +83,12 @@
             </div>
           </div>
 
-          <!-- New Items Table -->
+          <!-- New Items Container -->
           <div class="form-group">
             <label>Список нових виробів:</label>
-            <div class="scrap-table-container">
-              <table class="scrap-table" id="new-items-table">
-                <thead>
-                  <tr>
-                    <th>Опис (опціонально)</th>
-                    <th style="width: 150px;">Вага виробу, г</th>
-                    <th style="width: 50px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="new-item-rows">
-                  <!-- Rows generated dynamically by JS -->
-                </tbody>
-              </table>
+            <div id="new-item-cards" class="new-item-cards-container">
+              <!-- Item cards generated dynamically by JS -->
             </div>
-          </div>
-
-          <div class="form-row expandable-rates">
-            <div class="form-group col-4">
-              <label for="rate-metal">Ціна металу за грам:</label>
-              <div class="input-with-unit">
-                <input type="number" id="rate-metal" step="10" min="0">
-                <span class="unit">грн</span>
-              </div>
-              <div class="discount-wrapper">
-                <div class="discount-chips" id="metal-discount-chips">
-                  <button type="button" class="chip active" data-val="0">0</button>
-                  <button type="button" class="chip" data-val="100">-100</button>
-                  <button type="button" class="chip" data-val="200">-200</button>
-                  <button type="button" class="chip" data-val="300">-300</button>
-                  <button type="button" class="chip custom-trigger" id="custom-metal-discount-btn">Своя</button>
-                </div>
-                <input type="number" id="metal-discount-val" value="0" class="discount-custom-input" placeholder="Знижка на метал, грн" style="display: none;">
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="rate-work">Ціна роботи за грам:</label>
-              <div class="input-with-unit">
-                <input type="number" id="rate-work" step="10" min="0">
-                <span class="unit">грн</span>
-              </div>
-              <div class="discount-wrapper">
-                <div class="discount-chips" id="discount-chips">
-                  <button type="button" class="chip active" data-val="0">0</button>
-                  <button type="button" class="chip" data-val="100">-100</button>
-                  <button type="button" class="chip" data-val="200">-200</button>
-                  <button type="button" class="chip" data-val="300">-300</button>
-                  <button type="button" class="chip custom-trigger" id="custom-discount-btn">Своя</button>
-                </div>
-                <input type="number" id="discount-val" value="0" class="discount-custom-input" placeholder="Своя знижка, грн" style="display: none;">
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="rate-total">Загальна ціна за грам:</label>
-              <div class="input-with-unit">
-                <input type="number" id="rate-total" readonly style="background-color: var(--bg-card); opacity: 0.85;">
-                <span class="unit">грн</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="price-breakdown-subtext" id="calculated-gold-rate-text">
-            Ціна чистого металу: <strong id="gold-price-val">0</strong> грн/г | Робота (зі знижкою): <strong id="work-price-val">0</strong> грн/г
           </div>
         </div>
 

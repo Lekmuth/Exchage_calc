@@ -1288,3 +1288,104 @@ select:focus {
 .quick-desc-chip:active {
   transform: translateY(0);
 }
+
+/* --- Accordion Item Cards --- */
+.new-item-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.item-card:focus-within {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.item-card-header {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+}
+
+.item-card-header:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.item-card-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex-grow: 1;
+}
+
+.item-card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.item-card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.item-card-price {
+  font-weight: 700;
+  color: var(--gold-primary);
+  font-size: 1.1rem;
+  margin-right: 1rem;
+}
+
+.item-card-toggle {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.item-card.expanded .item-card-toggle {
+  transform: rotate(180deg);
+}
+
+.item-card-body {
+  display: none;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-main);
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+.item-card.expanded .item-card-body {
+  display: block;
+}
+
+.item-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
