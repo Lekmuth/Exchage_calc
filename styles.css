@@ -1226,3 +1226,43 @@ select:focus {
   color: var(--gold-primary);
   letter-spacing: 0.1em;
 }
+
+/* ==========================================================================
+   Quick Description Chips
+   ========================================================================== */
+.desc-cell-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.quick-desc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.quick-desc-chip {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.quick-desc-chip:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--gold-primary);
+  color: var(--gold-primary);
+  transform: translateY(-1px);
+}
+
+.quick-desc-chip:active {
+  transform: translateY(0);
+}

@@ -273,6 +273,28 @@ export function resetSettingsToDefault() {
   calculate();
 }
 
+// ---------- Helper for Quick Chips ----------
+function setupQuickChips(container, inputEl) {
+  const categories = ['Кільце', 'Сережки', 'Ланцюжок', 'Браслет', 'Кулон', 'Обручка'];
+  const chipsWrapper = document.createElement('div');
+  chipsWrapper.className = 'quick-desc-chips';
+  
+  categories.forEach(cat => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'quick-desc-chip';
+    chip.textContent = cat;
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      inputEl.value = cat;
+      inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    chipsWrapper.appendChild(chip);
+  });
+  
+  container.appendChild(chipsWrapper);
+}
+
 // ---------- New Item Rows ----------
 export function addNewItemRow(description = '', weight = '') {
   const rowId = state.nextNewItemRowId++;
@@ -282,7 +304,9 @@ export function addNewItemRow(description = '', weight = '') {
   tr.id = `new-item-row-${rowId}`;
   tr.innerHTML = `
     <td>
-      <input type="text" class="new-item-desc-input" placeholder="Кільце, сережки..." value="${description}">
+      <div class="desc-cell-wrapper">
+        <input type="text" class="new-item-desc-input" placeholder="Кільце, сережки..." value="${description}">
+      </div>
     </td>
     <td>
       <div class="input-with-unit" style="padding-right: 0;">
@@ -296,6 +320,11 @@ export function addNewItemRow(description = '', weight = '') {
   `;
   
   tbody.appendChild(tr);
+
+  // Setup quick chips under description input
+  const descWrapper = tr.querySelector('.desc-cell-wrapper');
+  const inputEl = tr.querySelector('.new-item-desc-input');
+  setupQuickChips(descWrapper, inputEl);
 
   // Hook up delete button
   tr.querySelector(`[data-delete-row="${rowId}"]`).addEventListener('click', () => deleteNewItemRow(rowId));
@@ -332,7 +361,9 @@ export function addScrapRow(description = '', weight = '', sample = '585', loss 
   tr.id = `scrap-row-${rowId}`;
   tr.innerHTML = `
     <td>
-      <input type="text" class="scrap-desc-input" placeholder="Кільце, ланцюжок..." value="${description}">
+      <div class="desc-cell-wrapper">
+        <input type="text" class="scrap-desc-input" placeholder="Кільце, ланцюжок..." value="${description}">
+      </div>
     </td>
     <td>
       <div class="input-with-unit" style="padding-right: 0;">
@@ -366,6 +397,11 @@ export function addScrapRow(description = '', weight = '', sample = '585', loss 
   `;
   
   tbody.appendChild(tr);
+
+  // Setup quick chips under description input
+  const descWrapper = tr.querySelector('.desc-cell-wrapper');
+  const inputEl = tr.querySelector('.scrap-desc-input');
+  setupQuickChips(descWrapper, inputEl);
 
   // Hook up delete button
   tr.querySelector(`[data-delete-row="${rowId}"]`).addEventListener('click', () => deleteScrapRow(rowId));
