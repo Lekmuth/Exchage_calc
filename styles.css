@@ -206,10 +206,11 @@ body {
   align-items: start;
 }
 
-/* 3-column layout for landscape tablets and desktops */
-@media (min-width: 1120px) {
+/* 3-column layout for landscape tablets and desktops (e.g. iPad landscape is 1024px) */
+@media (min-width: 1000px) {
   .main-content {
-    grid-template-columns: 1.1fr 1.1fr 1fr;
+    grid-template-columns: 1.1fr 1.12fr 1fr;
+    gap: 0.95rem; /* slightly tighter gap to fit 3 columns on tablet screen width */
   }
   .control-panel {
     display: contents; /* Pulls new-item and scrap sections up to main-content grid */
@@ -227,6 +228,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+#clear-calc-btn {
+  white-space: nowrap;
+  font-size: 0.72rem !important;
+  padding: 0.35rem 0.65rem !important;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -258,13 +267,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 1.25rem;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.75rem;
 }
 
 .card-header h2 {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   display: flex;
   align-items: center;
