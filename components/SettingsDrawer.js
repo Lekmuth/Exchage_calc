@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { loadPresetFromCloud, savePresetToCloud } from '../utils/cloudStorage';
 
-export default function SettingsDrawer({ isOpen, onClose, globalSettings, updateSettings, categories, setCategories }) {
+export default function SettingsDrawer({ isOpen, onClose, globalSettings, updateSettings, categories, setCategories, buybackRate, setBuybackRate }) {
   const [exchangeLoss, setExchangeLoss] = useState(globalSettings.exchangeLoss);
+  const [localBuybackRate, setLocalBuybackRate] = useState(buybackRate || 2000);
   const [localCategories, setLocalCategories] = useState([...categories]);
   const [storeCode, setStoreCode] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       setExchangeLoss(globalSettings.exchangeLoss);
+      setLocalBuybackRate(buybackRate);
       setLocalCategories([...categories]);
     }
-  }, [isOpen, globalSettings.exchangeLoss, categories]);
+  }, [isOpen, globalSettings.exchangeLoss, categories, buybackRate]);
 
   const handleSave = () => {
     updateSettings({
-      exchangeLoss: parseFloat(exchangeLoss) || 10
+      exchangeLoss: parseFloat(exchangeLoss) || 10,
+      buybackRate: parseFloat(localBuybackRate) || 0
     });
+    setBuybackRate(parseFloat(localBuybackRate) || 0);
     setCategories(localCategories);
     localStorage.setItem('exchangeCalcCategories', JSON.stringify(localCategories));
     onClose();
@@ -46,6 +50,7 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
       
       if (data.settings && data.categories) {
         if (data.settings.exchangeLoss !== undefined) setExchangeLoss(data.settings.exchangeLoss);
+        if (data.settings.buybackRate !== undefined) setLocalBuybackRate(data.settings.buybackRate);
         setLocalCategories(data.categories);
         updateSettings({
           appTitle: data.settings.appTitle || globalSettings.appTitle,
@@ -54,6 +59,7 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
       } else {
         // Legacy payload format fallback
         if (data.exchangeLoss !== undefined) setExchangeLoss(data.exchangeLoss);
+        if (data.buybackRate !== undefined) setLocalBuybackRate(data.buybackRate);
         if (data.categories && Array.isArray(data.categories)) setLocalCategories(data.categories);
         if (data.appTitle || data.appSubtitle) {
           updateSettings({
@@ -76,7 +82,8 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
         categories: localCategories,
         settings: {
           ...globalSettings,
-          exchangeLoss: parseFloat(exchangeLoss) || 10
+          exchangeLoss: parseFloat(exchangeLoss) || 10,
+          buybackRate: parseFloat(localBuybackRate) || 0
         }
       };
       const code = await savePresetToCloud(payload);
@@ -136,6 +143,18 @@ export default function SettingsDrawer({ isOpen, onClose, globalSettings, update
 
           <div className="settings-section" style={{ marginBottom: '2rem' }}>
             <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>Базові налаштування</h3>
+            
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label>Базова ціна викупу брухту (грн/г):</label>
+              <input 
+                type="number" 
+                value={localBuybackRate} 
+                onChange={e => setLocalBuybackRate(e.target.value)} 
+                step="50" min="0" 
+              />
+              <small className="help-text">Застосовується до нових чеків за замовчуванням.</small>
+            </div>
+
             <div className="form-group">
               <label>Відсоток втрат при обміні на нові вироби (%):</label>
               <input 

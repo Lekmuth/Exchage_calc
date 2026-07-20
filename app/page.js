@@ -248,6 +248,8 @@ export default function Calculator() {
         updateSettings={updateSettings}
         categories={categories}
         setCategories={setCategories}
+        buybackRate={buybackRate}
+        setBuybackRate={setBuybackRate}
       />
     </div>
   );
